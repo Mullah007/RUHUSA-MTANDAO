@@ -5,13 +5,13 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f8ff;
+            background-color: #f0f8ff; /* Light blue background */
             margin: 0;
             padding: 0;
             text-align: center;
         }
         .header {
-            background-color: #4682b4;
+            background-color: #4682b4; /* Steel blue */
             color: white;
             padding: 20px;
         }
@@ -27,33 +27,33 @@
             margin: 5px;
         }
         .submit-button {
-            background-color: #ff6347;
+            background-color: #ff6347; /* Tomato */
         }
         .submit-button:hover {
-            background-color: #ff4500;
+            background-color: #ff4500; /* Darker tomato */
         }
         .save-button {
-            background-color: #4CAF50;
+            background-color: #4CAF50; /* Green */
         }
         .save-button:hover {
-            background-color: #45a049;
+            background-color: #45a049; /* Darker green */
         }
         .report-button {
-            background-color: #2196F3;
+            background-color: #2196F3; /* Blue */
         }
         .report-button:hover {
-            background-color: #0b7dda;
+            background-color: #0b7dda; /* Darker blue */
         }
         .pdf-button {
-            background-color: #f44336;
+            background-color: #f44336; /* Red */
         }
         .pdf-button:hover {
-            background-color: #da190b;
+            background-color: #da190b; /* Darker red */
         }
         .footer {
             background-color: #333;
             color: white;
-            padding: 5px 0;
+            padding: 5px 0; /* Reduced height */
             position: fixed;
             width: 100%;
             bottom: 0;
@@ -76,7 +76,7 @@
         }
         .table-container {
             margin-top: 20px;
-            display: none;
+            display: none; /* Initially hidden */
             justify-content: center;
         }
         table {
@@ -218,44 +218,19 @@
 
         function addRowToTable(employee) {
             var table = document.getElementById('employeeTable').getElementsByTagName('tbody')[0];
-            var existingRow = findRowByName(employee.name);
-            
-            if (existingRow) {
-                // Update existing row
-                existingRow.cells[0].innerHTML = employee.sn;
-                existingRow.cells[2].innerHTML = employee.department;
-                existingRow.cells[3].innerHTML = employee.date;
-                existingRow.cells[4].innerHTML = employee.reason;
-                existingRow.cells[5].innerHTML = employee.days;
-                existingRow.cells[6].innerHTML = employee.responsibilities;
-            } else {
-                // Create a new row
-                var newRow = table.insertRow(table.rows.length);
-                newRow.insertCell(0).innerHTML = employee.sn;
-                newRow.insertCell(1).innerHTML = employee.name;
-                newRow.insertCell(2).innerHTML = employee.department;
-                newRow.insertCell(3).innerHTML = employee.date;
-                newRow.insertCell(4).innerHTML = employee.reason;
-                newRow.insertCell(5).innerHTML = employee.days;
-                newRow.insertCell(6).innerHTML = employee.responsibilities;
-                newRow.insertCell(7).innerHTML = `
-                    <button class="edit-button" onclick="editRow(this)">Edit</button>
-                    <button class="delete-button" onclick="deleteRow(this)">Delete</button>
-                `;
-            }
-        }
+            var newRow = table.insertRow(table.rows.length);
 
-        function findRowByName(name) {
-            var table = document.getElementById('employeeTable').getElementsByTagName('tbody')[0];
-            var rows = table.getElementsByTagName('tr');
-            
-            for (var i = 0; i < rows.length; i++) {
-                var rowName = rows[i].cells[1].innerText;
-                if (rowName === name) {
-                    return rows[i];
-                }
-            }
-            return null;
+            newRow.insertCell(0).innerHTML = employee.sn;
+            newRow.insertCell(1).innerHTML = employee.name;
+            newRow.insertCell(2).innerHTML = employee.department;
+            newRow.insertCell(3).innerHTML = employee.date;
+            newRow.insertCell(4).innerHTML = employee.reason;
+            newRow.insertCell(5).innerHTML = employee.days;
+            newRow.insertCell(6).innerHTML = employee.responsibilities;
+            newRow.insertCell(7).innerHTML = `
+                <button class="edit-button" onclick="editRow(this)">Edit</button>
+                <button class="delete-button" onclick="deleteRow(this)">Delete</button>
+            `;
         }
 
         function loadTableData() {
