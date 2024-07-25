@@ -73,7 +73,11 @@
             var username = document.getElementById('username').value;
             var password = document.getElementById('password').value;
 
-            if (username === "mullah007" && password === "1776") {
+            // Replace 'yourUsername' and 'yourPassword' with your actual username and password.
+            var correctUsername = "yourUsername";
+            var correctPassword = "yourPassword";
+
+            if (username === correctUsername && password === correctPassword) {
                 window.location.href = "welcome.html";
                 return false;
             } else {
@@ -82,5 +86,49 @@
             }
         }
     </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RUHUSA MTANDAO</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff; /* Light blue background */
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #4682b4; /* Steel blue */
+            color: white;
+            padding: 20px;
+        }
+        .main {
+            padding: 50px;
+        }
+        .footer {
+            background-color: #333;
+            color: white;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>RUHUSA MTANDAO</h1>
+    </div>
+    <div class="main">
+        <h2>Welcome to RUHUSA MTANDAO!</h2>
+        <p>You have successfully logged in.</p>
+    </div>
+    <div class="footer">
+        <p>Prepared by HUSSEIN MOHAMED</p>
+    </div>
 </body>
 </html>
