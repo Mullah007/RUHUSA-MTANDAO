@@ -18,9 +18,7 @@
         .main {
             margin: 50px 0;
         }
-        .login-button, .submit-button, .save-button {
-            background-color: #ff6347; /* Tomato */
-            color: white;
+        .button {
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
@@ -28,8 +26,29 @@
             font-size: 16px;
             margin: 5px;
         }
-        .login-button:hover, .submit-button:hover, .save-button:hover {
+        .submit-button {
+            background-color: #ff6347; /* Tomato */
+        }
+        .submit-button:hover {
             background-color: #ff4500; /* Darker tomato */
+        }
+        .save-button {
+            background-color: #4CAF50; /* Green */
+        }
+        .save-button:hover {
+            background-color: #45a049; /* Darker green */
+        }
+        .report-button {
+            background-color: #2196F3; /* Blue */
+        }
+        .report-button:hover {
+            background-color: #0b7dda; /* Darker blue */
+        }
+        .pdf-button {
+            background-color: #f44336; /* Red */
+        }
+        .pdf-button:hover {
+            background-color: #da190b; /* Darker red */
         }
         .footer {
             background-color: #333;
@@ -51,6 +70,10 @@
             border-radius: 5px;
             width: 300px;
         }
+        .button-container {
+            display: flex;
+            justify-content: center;
+        }
         .table-container {
             margin-top: 20px;
             display: none; /* Initially hidden */
@@ -67,31 +90,9 @@
             padding: 10px;
             text-align: left;
         }
-        .edit-button {
-            background-color: #4CAF50; /* Green */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            padding: 5px 10px;
-            margin-left: 5px;
-        }
-        .edit-button:hover {
-            background-color: #45a049; /* Darker green */
-        }
-        .delete-button {
-            background-color: #f44336; /* Red */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            padding: 5px 10px;
-            margin-left: 5px;
-        }
-        .delete-button:hover {
-            background-color: #da190b; /* Darker red */
-        }
     </style>
+    <!-- Include jsPDF library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 </head>
 <body>
     <div class="header">
@@ -105,7 +106,7 @@
             <form class="login-form" onsubmit="return checkLogin()">
                 <input type="text" id="username" name="username" placeholder="Username">
                 <input type="password" id="password" name="password" placeholder="Password">
-                <button type="submit" class="login-button">Login</button>
+                <button type="submit" class="button submit-button">Login</button>
             </form>
         </div>
 
@@ -120,8 +121,12 @@
                 <textarea id="reason" placeholder="Reason for Permission"></textarea>
                 <input type="number" id="days" placeholder="Days Spent">
                 <textarea id="responsibilities" placeholder="Responsibilities"></textarea>
-                <button class="submit-button" onclick="submitForm()">Submit</button>
-                <button class="save-button" onclick="saveData()">Save</button>
+                <div class="button-container">
+                    <button class="button submit-button" onclick="submitForm()">Submit</button>
+                    <button class="button save-button" onclick="saveData()">Save</button>
+                    <button class="button report-button" onclick="generateReport()">Report</button>
+                    <button class="button pdf-button" onclick="generatePDF()">PDF</button>
+                </div>
             </div>
             <div class="table-container" id="table-container">
                 <table id="employeeTable">
@@ -280,6 +285,34 @@
         function deleteRow(btn) {
             var row = btn.parentNode.parentNode;
             row.parentNode.removeChild(row);
+        }
+
+        function generateReport() {
+            var reportWindow = window.open("", "Employee Permission Report", "width=800,height=600");
+            var tableHTML = `
+                <html>
+                <head><title>Employee Permission Report</title></head>
+                <body>
+                    <h1>Employee Permission Report</h1>
+                    <table border="1" style="width:100%;border-collapse:collapse;">
+                        ${document.getElementById('employeeTable').innerHTML}
+                    </table>
+                </body>
+                </html>
+            `;
+            reportWindow.document.write(tableHTML);
+            reportWindow.document.close();
+        }
+
+        function generatePDF() {
+            var { jsPDF } = window.jspdf;
+            var doc = new jsPDF();
+            var table = document.getElementById('employeeTable');
+            var tableHTML = table.outerHTML.replace(/ /g, '%20');
+
+            doc.text(20, 20, 'Employee Permission Report');
+            doc.fromHTML(tableHTML, 20, 30);
+            doc.save('Employee_Permission_Report.pdf');
         }
     </script>
 </body>
