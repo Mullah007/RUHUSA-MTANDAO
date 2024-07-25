@@ -18,7 +18,7 @@
         .main {
             margin: 50px 0;
         }
-        .login-button, .submit-button {
+        .login-button, .submit-button, .save-button {
             background-color: #ff6347; /* Tomato */
             color: white;
             padding: 10px 20px;
@@ -26,8 +26,9 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
+            margin: 5px;
         }
-        .login-button:hover, .submit-button:hover {
+        .login-button:hover, .submit-button:hover, .save-button:hover {
             background-color: #ff4500; /* Darker tomato */
         }
         .footer {
@@ -120,6 +121,7 @@
                 <input type="number" id="days" placeholder="Days Spent">
                 <textarea id="responsibilities" placeholder="Responsibilities"></textarea>
                 <button class="submit-button" onclick="submitForm()">Submit</button>
+                <button class="save-button" onclick="saveData()">Save</button>
             </div>
             <div class="table-container" id="table-container">
                 <table id="employeeTable">
@@ -189,11 +191,6 @@
                     responsibilities: responsibilities
                 };
 
-                // Save employee data to local storage
-                var employees = JSON.parse(localStorage.getItem('employees')) || [];
-                employees.push(employee);
-                localStorage.setItem('employees', JSON.stringify(employees));
-
                 // Add data to the table
                 addRowToTable(employee);
 
@@ -241,6 +238,29 @@
             }
         }
 
+        function saveData() {
+            var table = document.getElementById('employeeTable').getElementsByTagName('tbody')[0];
+            var rows = table.getElementsByTagName('tr');
+            var employees = [];
+
+            for (var i = 0; i < rows.length; i++) {
+                var cells = rows[i].getElementsByTagName('td');
+                var employee = {
+                    sn: cells[0].innerHTML,
+                    name: cells[1].innerHTML,
+                    department: cells[2].innerHTML,
+                    date: cells[3].innerHTML,
+                    reason: cells[4].innerHTML,
+                    days: cells[5].innerHTML,
+                    responsibilities: cells[6].innerHTML
+                };
+                employees.push(employee);
+            }
+
+            localStorage.setItem('employees', JSON.stringify(employees));
+            alert("Data saved successfully!");
+        }
+
         function editRow(btn) {
             var row = btn.parentNode.parentNode;
             var cells = row.getElementsByTagName('td');
@@ -259,19 +279,7 @@
 
         function deleteRow(btn) {
             var row = btn.parentNode.parentNode;
-            var sn = row.getElementsByTagName('td')[0].innerHTML;
-
-            // Remove from local storage
-            var employees = JSON.parse(localStorage.getItem('employees')) || [];
-            employees = employees.filter(employee => employee.sn !== sn);
-            localStorage.setItem('employees', JSON.stringify(employees));
-
-            // Remove the row from the table
             row.parentNode.removeChild(row);
-
-            if (employees.length === 0) {
-                document.getElementById('table-container').style.display = 'none';
-            }
         }
     </script>
 </body>
