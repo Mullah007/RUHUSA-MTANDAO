@@ -91,8 +91,9 @@
             text-align: left;
         }
     </style>
-    <!-- Include jsPDF library -->
+    <!-- Include jsPDF and jsPDF-AutoTable -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.16/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
     <div class="header">
@@ -308,10 +309,29 @@
             var { jsPDF } = window.jspdf;
             var doc = new jsPDF();
             var table = document.getElementById('employeeTable');
-            var tableHTML = table.outerHTML.replace(/ /g, '%20');
+            var rows = [];
 
-            doc.text(20, 20, 'Employee Permission Report');
-            doc.fromHTML(tableHTML, 20, 30);
+            // Add table headers
+            var headers = [];
+            table.querySelectorAll('th').forEach(function(header) {
+                headers.push(header.innerText);
+            });
+            rows.push(headers);
+
+            // Add table rows
+            table.querySelectorAll('tbody tr').forEach(function(row) {
+                var rowData = [];
+                row.querySelectorAll('td').forEach(function(cell) {
+                    rowData.push(cell.innerText);
+                });
+                rows.push(rowData);
+            });
+
+            doc.autoTable({
+                head: [rows[0]],
+                body: rows.slice(1),
+            });
+
             doc.save('Employee_Permission_Report.pdf');
         }
     </script>
