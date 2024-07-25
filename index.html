@@ -58,14 +58,29 @@
     </div>
     <div class="main">
         <p>Welcome to RUHUSA MTANDAO. Please log in to access our services.</p>
-        <form class="login-form">
-            <input type="text" name="username" placeholder="Username" value="mullah007">
-            <input type="password" name="password" placeholder="Password" value="1776">
+        <form class="login-form" onsubmit="return checkLogin()">
+            <input type="text" id="username" name="username" placeholder="Username">
+            <input type="password" id="password" name="password" placeholder="Password">
             <button type="submit" class="login-button">Login</button>
         </form>
     </div>
     <div class="footer">
         <p>Prepared by HUSSEIN MOHAMED</p>
     </div>
+
+    <script>
+        function checkLogin() {
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+
+            if (username === "mullah007" && password === "1776") {
+                window.location.href = "welcome.html";
+                return false;
+            } else {
+                alert("Incorrect username or password!");
+                return false;
+            }
+        }
+    </script>
 </body>
 </html>
