@@ -186,19 +186,41 @@
 
             // Check if all fields are filled
             if (sn && name && department && date && reason && days && responsibilities) {
-                // Create an employee object
-                var employee = {
-                    sn: sn,
-                    name: name,
-                    department: department,
-                    date: date,
-                    reason: reason,
-                    days: days,
-                    responsibilities: responsibilities
-                };
+                // Get existing employees from local storage
+                var employees = JSON.parse(localStorage.getItem('employees')) || [];
+                var existingEmployee = employees.find(emp => emp.name === name);
 
-                // Add data to the table
-                addRowToTable(employee);
+                if (existingEmployee) {
+                    // Append new details if the employee exists
+                    existingEmployee.permissions.push({
+                        sn: sn,
+                        department: department,
+                        date: date,
+                        reason: reason,
+                        days: days,
+                        responsibilities: responsibilities
+                    });
+                } else {
+                    // Create new employee entry if it doesn't exist
+                    var employee = {
+                        name: name,
+                        permissions: [{
+                            sn: sn,
+                            department: department,
+                            date: date,
+                            reason: reason,
+                            days: days,
+                            responsibilities: responsibilities
+                        }]
+                    };
+                    employees.push(employee);
+                }
+
+                // Update local storage
+                localStorage.setItem('employees', JSON.stringify(employees));
+
+                // Reload table data
+                loadTableData();
 
                 // Clear the form
                 document.getElementById('sn').value = '';
@@ -218,23 +240,35 @@
 
         function addRowToTable(employee) {
             var table = document.getElementById('employeeTable').getElementsByTagName('tbody')[0];
-            var newRow = table.insertRow(table.rows.length);
+            var nameInserted = false; // To track if the name has been inserted
 
-            newRow.insertCell(0).innerHTML = employee.sn;
-            newRow.insertCell(1).innerHTML = employee.name;
-            newRow.insertCell(2).innerHTML = employee.department;
-            newRow.insertCell(3).innerHTML = employee.date;
-            newRow.insertCell(4).innerHTML = employee.reason;
-            newRow.insertCell(5).innerHTML = employee.days;
-            newRow.insertCell(6).innerHTML = employee.responsibilities;
-            newRow.insertCell(7).innerHTML = `
-                <button class="edit-button" onclick="editRow(this)">Edit</button>
-                <button class="delete-button" onclick="deleteRow(this)">Delete</button>
-            `;
+            employee.permissions.forEach((permission, index) => {
+                var newRow = table.insertRow(table.rows.length);
+
+                newRow.insertCell(0).innerHTML = permission.sn;
+                if (!nameInserted) {
+                    newRow.insertCell(1).innerHTML = employee.name;
+                    nameInserted = true; // Mark name as inserted
+                } else {
+                    newRow.insertCell(1).innerHTML = ""; // Empty cell for the name
+                }
+                newRow.insertCell(2).innerHTML = permission.department;
+                newRow.insertCell(3).innerHTML = permission.date;
+                newRow.insertCell(4).innerHTML = permission.reason;
+                newRow.insertCell(5).innerHTML = permission.days;
+                newRow.insertCell(6).innerHTML = permission.responsibilities;
+                newRow.insertCell(7).innerHTML = `
+                    <button class="edit-button" onclick="editRow(this)">Edit</button>
+                    <button class="delete-button" onclick="deleteRow(this)">Delete</button>
+                `;
+            });
         }
 
         function loadTableData() {
             var employees = JSON.parse(localStorage.getItem('employees')) || [];
+            var table = document.getElementById('employeeTable').getElementsByTagName('tbody')[0];
+            table.innerHTML = ''; // Clear existing table data
+
             employees.forEach(function(employee) {
                 addRowToTable(employee);
             });
@@ -245,25 +279,7 @@
         }
 
         function saveData() {
-            var table = document.getElementById('employeeTable').getElementsByTagName('tbody')[0];
-            var rows = table.getElementsByTagName('tr');
-            var employees = [];
-
-            for (var i = 0; i < rows.length; i++) {
-                var cells = rows[i].getElementsByTagName('td');
-                var employee = {
-                    sn: cells[0].innerHTML,
-                    name: cells[1].innerHTML,
-                    department: cells[2].innerHTML,
-                    date: cells[3].innerHTML,
-                    reason: cells[4].innerHTML,
-                    days: cells[5].innerHTML,
-                    responsibilities: cells[6].innerHTML
-                };
-                employees.push(employee);
-            }
-
-            localStorage.setItem('employees', JSON.stringify(employees));
+            // The data is already saved to local storage in submitForm(), so this function can be used to trigger any additional save actions if needed.
             alert("Data saved successfully!");
         }
 
@@ -285,7 +301,20 @@
 
         function deleteRow(btn) {
             var row = btn.parentNode.parentNode;
+            var name = row.cells[1].innerHTML || row.previousElementSibling.cells[1].innerHTML;
+            var sn = row.cells[0].innerHTML;
             row.parentNode.removeChild(row);
+
+            // Update local storage
+            var employees = JSON.parse(localStorage.getItem('employees')) || [];
+            var employee = employees.find(emp => emp.name === name);
+            if (employee) {
+                employee.permissions = employee.permissions.filter(p => p.sn !== sn);
+                if (employee.permissions.length === 0) {
+                    employees = employees.filter(emp => emp.name !== name);
+                }
+            }
+            localStorage.setItem('employees', JSON.stringify(employees));
         }
 
         function generateReport() {
