@@ -18,7 +18,7 @@
         .main {
             margin: 50px 0;
         }
-        .login-button {
+        .login-button, .submit-button {
             background-color: #ff6347; /* Tomato */
             color: white;
             padding: 15px 30px;
@@ -27,7 +27,7 @@
             cursor: pointer;
             font-size: 16px;
         }
-        .login-button:hover {
+        .login-button:hover, .submit-button:hover {
             background-color: #ff4500; /* Darker tomato */
         }
         .footer {
@@ -38,17 +38,33 @@
             width: 100%;
             bottom: 0;
         }
-        .login-form {
+        .login-form, .form-container {
             display: flex;
             flex-direction: column;
             align-items: center;
         }
-        .login-form input {
+        .login-form input, .form-container input, .form-container textarea {
             padding: 10px;
             margin: 5px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            width: 200px;
+            width: 300px;
+        }
+        .table-container {
+            margin-top: 20px;
+            display: none; /* Initially hidden */
+            justify-content: center;
+        }
+        table {
+            width: 80%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
         }
     </style>
 </head>
@@ -56,16 +72,53 @@
     <div class="header">
         <h1>RUHUSA MTANDAO</h1>
     </div>
+
     <div class="main">
-        <p>Welcome to RUHUSA MTANDAO. Please log in to access our services.</p>
-        <form class="login-form" onsubmit="return checkLogin()">
-            <input type="text" id="username" name="username" placeholder="Username">
-            <input type="password" id="password" name="password" placeholder="Password">
-            <button type="submit" class="login-button">Login</button>
-        </form>
+        <!-- Login Section -->
+        <div id="login-section">
+            <p>Welcome to RUHUSA MTANDAO. Please log in to access our services.</p>
+            <form class="login-form" onsubmit="return checkLogin()">
+                <input type="text" id="username" name="username" placeholder="Username">
+                <input type="password" id="password" name="password" placeholder="Password">
+                <button type="submit" class="login-button">Login</button>
+            </form>
+        </div>
+
+        <!-- Permission Request Section -->
+        <div id="permission-section" style="display:none;">
+            <h2>Employee Permission Request</h2>
+            <div class="form-container">
+                <input type="text" id="sn" placeholder="SN">
+                <input type="text" id="name" placeholder="Name">
+                <input type="text" id="department" placeholder="Department">
+                <input type="date" id="date">
+                <textarea id="reason" placeholder="Reason for Permission"></textarea>
+                <input type="number" id="days" placeholder="Days Spent">
+                <textarea id="responsibilities" placeholder="Responsibilities"></textarea>
+                <button class="submit-button" onclick="submitForm()">Submit</button>
+            </div>
+            <div class="table-container" id="table-container">
+                <table id="employeeTable">
+                    <thead>
+                        <tr>
+                            <th>SN</th>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Date</th>
+                            <th>Reason for Permission</th>
+                            <th>Days Spent</th>
+                            <th>Responsibilities</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
+
     <div class="footer">
-        <p>Developed by HUSSEIN MOHAMED</p>
+        <p>Prepared by HUSSEIN MOHAMED</p>
     </div>
 
     <script>
@@ -78,57 +131,54 @@
             var correctPassword = "1776";
 
             if (username === correctUsername && password === correctPassword) {
-                window.location.href = "welcome.html";
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('permission-section').style.display = 'block';
                 return false;
             } else {
                 alert("Incorrect username or password!");
                 return false;
             }
         }
-    </script>
-</body>
-</html>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>RUHUSA MTANDAO</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f8ff; /* Light blue background */
-            text-align: center;
-            margin: 0;
-            padding: 0;
+        function submitForm() {
+            // Get values from the form
+            var sn = document.getElementById('sn').value;
+            var name = document.getElementById('name').value;
+            var department = document.getElementById('department').value;
+            var date = document.getElementById('date').value;
+            var reason = document.getElementById('reason').value;
+            var days = document.getElementById('days').value;
+            var responsibilities = document.getElementById('responsibilities').value;
+
+            // Check if all fields are filled
+            if (sn && name && department && date && reason && days && responsibilities) {
+                // Add data to the table
+                var table = document.getElementById('employeeTable').getElementsByTagName('tbody')[0];
+                var newRow = table.insertRow(table.rows.length);
+
+                newRow.insertCell(0).innerHTML = sn;
+                newRow.insertCell(1).innerHTML = name;
+                newRow.insertCell(2).innerHTML = department;
+                newRow.insertCell(3).innerHTML = date;
+                newRow.insertCell(4).innerHTML = reason;
+                newRow.insertCell(5).innerHTML = days;
+                newRow.insertCell(6).innerHTML = responsibilities;
+
+                // Clear the form
+                document.getElementById('sn').value = '';
+                document.getElementById('name').value = '';
+                document.getElementById('department').value = '';
+                document.getElementById('date').value = '';
+                document.getElementById('reason').value = '';
+                document.getElementById('days').value = '';
+                document.getElementById('responsibilities').value = '';
+
+                // Show the table
+                document.getElementById('table-container').style.display = 'flex';
+            } else {
+                alert("Please fill in all fields.");
+            }
         }
-        .header {
-            background-color: #4682b4; /* Steel blue */
-            color: white;
-            padding: 20px;
-        }
-        .main {
-            padding: 50px;
-        }
-        .footer {
-            background-color: #333;
-            color: white;
-            padding: 10px 0;
-            position: fixed;
-            width: 100%;
-            bottom: 0;
-        }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>RUHUSA MTANDAO</h1>
-    </div>
-    <div class="main">
-        <h2>Welcome to RUHUSA MTANDAO!</h2>
-        <p>You have successfully logged in.</p>
-    </div>
-    <div class="footer">
-        <p>Prepared by HUSSEIN MOHAMED</p>
-    </div>
+    </script>
 </body>
 </html>
