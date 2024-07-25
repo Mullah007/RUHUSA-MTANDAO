@@ -289,15 +289,56 @@
         }
 
         function generateReport() {
+            var employees = JSON.parse(localStorage.getItem('employees')) || [];
+            var nameDaysMap = {};
+
+            // Calculate total days spent for each employee
+            employees.forEach(function(employee) {
+                if (nameDaysMap[employee.name]) {
+                    nameDaysMap[employee.name] += parseInt(employee.days);
+                } else {
+                    nameDaysMap[employee.name] = parseInt(employee.days);
+                }
+            });
+
+            // Create a new table with names and total days
+            var totalDaysTableHTML = `
+                <table border="1" style="width:100%;border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Total Days Spent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            for (var name in nameDaysMap) {
+                totalDaysTableHTML += `
+                    <tr>
+                        <td>${name}</td>
+                        <td>${nameDaysMap[name]}</td>
+                    </tr>
+                `;
+            }
+
+            totalDaysTableHTML += `
+                    </tbody>
+                </table>
+            `;
+
             var reportWindow = window.open("", "Employee Permission Report", "width=800,height=600");
             var tableHTML = `
                 <html>
                 <head><title>Employee Permission Report</title></head>
                 <body>
                     <h1>Employee Permission Report</h1>
+                    <h2>Permission Details</h2>
                     <table border="1" style="width:100%;border-collapse:collapse;">
                         ${document.getElementById('employeeTable').innerHTML}
                     </table>
+                    <h2>Total Days Spent by Each Employee</h2>
+                    ${totalDaysTableHTML}
                 </body>
                 </html>
             `;
