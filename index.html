@@ -301,23 +301,26 @@
                 }
             });
 
-            // Create a new table with names and total days
+            // Create a new table with names, total days, and status
             var totalDaysTableHTML = `
                 <table border="1" style="width:100%;border-collapse:collapse;">
                     <thead>
                         <tr>
                             <th>Name</th>
                             <th>Total Days Spent</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
             `;
 
             for (var name in nameDaysMap) {
+                var status = nameDaysMap[name] >= 7 ? "FINISHED" : "";
                 totalDaysTableHTML += `
                     <tr>
                         <td>${name}</td>
                         <td>${nameDaysMap[name]}</td>
+                        <td>${status}</td>
                     </tr>
                 `;
             }
