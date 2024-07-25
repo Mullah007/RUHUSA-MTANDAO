@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WINNERS RUHUSA PORTAL</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 80%;
+            max-width: 800px;
+            margin-top: 20px;
+        }
+        .container h1 {
+            color: #1E90FF;
+        }
+        .container h2 {
+            color: #333;
+        }
+        .form-group {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .search-box {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .search-box input {
+            width: 70%;
+            margin-right: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #1E90FF;
+            color: #fff;
+        }
+        .action-buttons button {
+            padding: 5px 10px;
+            margin-right: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+        }
+        .action-buttons .edit-button {
+            background-color: #4CAF50;
+        }
+        .action-buttons .delete-button {
+            background-color: #f44336;
+        }
+        .action-buttons .approve-button {
+            background-color: #1E90FF;
+        }
+        .action-buttons .denied-button {
+            background-color: #ff9800;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+            background-color: #1E90FF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0b78e3;
+        }
+        .data-form, .login-form {
+            display: none;
+        }
+        #report {
+            display: none;
+            margin-top: 20px;
+            text-align: left;
+        }
+        footer {
+            margin-top: 20px;
+            color: #777;
+            font-size: 14px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h1>WINNERS RUHUSA PORTAL</h1>
+    <div class="login-form" id="loginForm">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username"><br><br>
+        <input type="password" id="password" placeholder="Password"><br><br>
+        <button onclick="login()">Submit</button>
+        <footer>Developed by Hussein Mohamed - 0672605550</footer>
+    </div>
+    <div class="data-form" id="dataForm">
+        <h2>Permission Request Form</h2>
+        <form id="employeeForm" onsubmit="addEmployee(); return false;">
+            <div class="form-group">
+                <input type="text" id="name" placeholder="Name" required>
+            </div>
+            <div class="form-group">
+                <input type="text" id="department" placeholder="Department" required>
+            </div>
+            <div class="form-group">
+                <input type="date" id="date" required>
+            </div>
+            <div class="form-group">
+                <input type="text" id="reason" placeholder="Reason for Permission" required>
+            </div>
+            <div class="form-group">
+                <input type="number" id="daysSpent" placeholder="Days Spent" required>
+            </div>
+            <div class="search-box">
+                <button type="submit">Add Employee</button>
+                <input type="text" id="searchInput" placeholder="Search..." onkeyup="findEmployee()">
+                <button type="button" onclick="findEmployee()">FIND</button>
+            </div>
+        </form>
+        <table id="employeeTable">
+            <thead>
+                <tr>
+                    <th>S/N</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Date</th>
+                    <th>Reason for Permission</th>
+                    <th>Days Spent</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <button onclick="toggleReport()">REPORT</button>
+        <button onclick="downloadReport()">Download PDF</button>
+        <div id="report"></div>
+    </div>
+</div>
+
+<script>
+    let reportVisible = false;
+    let editingIndex = null;
+
+    function login() {
+        var username = document.getElementById("username").value;
+        var password = document.getElementById("password").value;
+        if (username === "mullah007" && password === "korogwe2024") {
+            document.getElementById("loginForm").style.display = "none";
+            document.getElementById("dataForm").style.display = "block";
+            loadEmployees();
+        } else {
+            alert("Incorrect username or password!");
+        }
+    }
+
+    function addEmployee() {
+        var name = document.getElementById("name").value.trim();
+        var department = document.getElementById("department").value.trim();
+        var date = document.getElementById("date").value;
+        var reason = document.getElementById("reason").value.trim();
+        var daysSpent = parseInt(document.getElementById("daysSpent").value.trim(), 10);
+        
+        var employees = JSON.parse(localStorage.getItem("employees")) || [];
+        var existingEmployee = employees.find(employee => employee.name === name);
+
+        if (editingIndex !== null) {
+            var employee = employees[editingIndex];
+            employee.permissions[editingIndex] = { date, reason, daysSpent };
+            editingIndex = null;
+        } else {
+            if (existingEmployee) {
+                existingEmployee.permissions.push({ date, reason, daysSpent });
+            } else {
+                employees.push({
+                    name,
+                    department,
+                    permissions: [{ date, reason, daysSpent }]
+                });
+            }
+        }
+        
+        localStorage.setItem("employees", JSON.stringify(employees));
+        loadEmployees();
+        document.getElementById("employeeForm").reset();
+    }
+
+    function loadEmployees() {
+        var employees = JSON.parse(localStorage.getItem("employees")) || [];
+        var tableBody = document.getElementById("employeeTable").getElementsByTagName("tbody")[0];
+        tableBody.innerHTML = '';
+
+        employees.forEach((employee, index) => {
+            var rowSpan = employee.permissions.length;
+            employee.permissions.forEach((permission, permIndex) => {
+                var row = tableBody.insertRow();
+                
+                if (permIndex === 0) {
+                    var snCell = row.insertCell(0);
+                    snCell.innerHTML = index + 1;
+                    snCell.rowSpan = rowSpan;
+
+                    var nameCell = row.insertCell(1);
+                    nameCell.innerHTML = employee.name;
+                    nameCell.rowSpan = rowSpan;
+
+                    var departmentCell = row.insertCell(2);
+                    departmentCell.innerHTML = employee.department;
+                    departmentCell.rowSpan = rowSpan;
+                } else {
+                    row.insertCell(0);
+                    row.insertCell(1);
+                    row.insertCell(2);
+                }
+                
+                row.insertCell(3).innerHTML = permission.date;
+                row.insertCell(4).innerHTML = permission.reason;
+                row.insertCell(5).innerHTML = permission.daysSpent;
+                
+                var actionCell = row.insertCell(6);
+                actionCell.innerHTML = `<div class="action-buttons">
+                                            <button class="edit-button" onclick="editPermission(${index})">Edit</button>
+                                            <button class="delete-button" onclick="deletePermission(this)">Delete</button>
+                                            <button class="${permission.daysSpent > 7 ? 'denied-button' : 'approve-button'}" onclick="handleApproval(${permission.daysSpent})">${permission.daysSpent > 7 ? 'DENIED' : 'Approve'}</button>
+                                        </div>`;
+            });
+        });
+    }
+
+    function editPermission(index) {
+        var employees = JSON.parse(localStorage.getItem("employees")) || [];
+        var employee = employees[index];
+
+        document.getElementById("name").value = employee.name;
+        document.getElementById("department").value = employee.department;
+        document.getElementById("date").value = employee.permissions[0].date;
+        document.getElementById("reason").value = employee.permissions[0].reason;
+        document.getElementById("daysSpent").value = employee.permissions[0].daysSpent;
+        
+        editingIndex = index;
+    }
+
+    function deletePermission(button) {
+        var row = button.parentNode.parentNode.parentNode;
+        var name = row.cells[1].innerHTML;
+        var date = row.cells[3].innerHTML;
+
+        var employees = JSON.parse(localStorage.getItem("employees")) || [];
+        var employeeIndex = employees.findIndex(employee => employee.name === name);
+        if (employeeIndex !== -1) {
+            var permissionIndex = employees[employeeIndex].permissions.findIndex(permission => permission.date === date);
+            if (permissionIndex !== -1) {
+                employees[employeeIndex].permissions.splice(permissionIndex, 1);
+                if (employees[employeeIndex].permissions.length === 0) {
+                    employees.splice(employeeIndex, 1);
+                }
+            }
+        }
+
+        localStorage.setItem("employees", JSON.stringify(employees));
+        loadEmployees();
+    }
+
+    function findEmployee() {
+        var input = document.getElementById("searchInput");
+        var filter = input.value.toLowerCase();
+        var table = document.getElementById("employeeTable");
+        var tr = table.getElementsByTagName("tr");
+
+        for (var i = 1; i < tr.length; i++) {
+            var tdName = tr[i].getElementsByTagName("td")[1];
+            var tdDepartment = tr[i].getElementsByTagName("td")[2];
+            var tdReason = tr[i].getElementsByTagName("td")[4];
+            if (tdName || tdDepartment || tdReason) {
+                var nameText = tdName.textContent || tdName.innerText;
+                var departmentText = tdDepartment.textContent || tdDepartment.innerText;
+                var reasonText = tdReason.textContent || tdReason.innerText;
+                if (nameText.toLowerCase().indexOf(filter) > -1 || 
+                    departmentText.toLowerCase().indexOf(filter) > -1 ||
+                    reasonText.toLowerCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }       
+        }
+    }
+
+    function handleApproval(daysSpent) {
+        alert(daysSpent > 7 ? "DENIED" : "Permitted");
+    }
+
+    function toggleReport() {
+        var report = document.getElementById("report");
+        if (reportVisible) {
+            report.innerHTML = '';
+            report.style.display = 'none';
+        } else {
+            generateReport();
+            report.style.display = 'block';
+        }
+        reportVisible = !reportVisible;
+    }
+
+    function generateReport() {
+        var employees = JSON.parse(localStorage.getItem("employees")) || [];
+        var report = document.getElementById("report");
+        report.innerHTML = '<h3>Employee Report</h3>';
+
+        employees.forEach(employee => {
+            report.innerHTML += `<p><strong>${employee.name} (Department: ${employee.department}):</strong></p>`;
+            employee.permissions.forEach(permission => {
+                report.innerHTML += `<p>Date: ${permission.date}, Reason: ${permission.reason}, Days Spent: ${permission.daysSpent}</p>`;
+            });
+            report.innerHTML += '<hr>';
+        });
+    }
+
+    function downloadReport() {
+        var { jsPDF } = window.jspdf;
+        var doc = new jsPDF();
+        var employees = JSON.parse(localStorage.getItem("employees")) || [];
+        
+        let y = 10; // Starting y position
+
+        doc.setFontSize(12);
+        doc.text("Employee Report", 10, y);
+        y += 10;
+
+        employees.forEach(employee => {
+            doc.setFontSize(10);
+            doc.text(`${employee.name} (Department: ${employee.department}):`, 10, y);
+            y += 10;
+
+            employee.permissions.forEach(permission => {
+                doc.text(`Date: ${permission.date}, Reason: ${permission.reason}, Days Spent: ${permission.daysSpent}`, 10, y);
+                y += 10;
+            });
+            doc.text('---------------------------------', 10, y);
+            y += 10;
+        });
+
+        doc.save('Employee_Report.pdf');
+    }
+
+    window.onload = function() {
+        document.getElementById("loginForm").style.display = "block";
+    }
+</script>
+
+</body>
+</html>
