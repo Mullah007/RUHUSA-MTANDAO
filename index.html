@@ -140,7 +140,7 @@
                             <th>Reason for Permission</th>
                             <th>Days Spent</th>
                             <th>Responsibilities</th>
-                            <th>Actions</th>
+                            <!-- Removed Actions Column -->
                         </tr>
                     </thead>
                     <tbody>
@@ -227,10 +227,6 @@
             newRow.insertCell(4).innerHTML = employee.reason;
             newRow.insertCell(5).innerHTML = employee.days;
             newRow.insertCell(6).innerHTML = employee.responsibilities;
-            newRow.insertCell(7).innerHTML = `
-                <button class="edit-button" onclick="editRow(this)">Edit</button>
-                <button class="delete-button" onclick="deleteRow(this)">Delete</button>
-            `;
         }
 
         function loadTableData() {
@@ -367,8 +363,10 @@
             rows.push(headers);
             table.querySelectorAll('tbody tr').forEach(function(row) {
                 var rowData = [];
-                row.querySelectorAll('td').forEach(function(cell) {
-                    rowData.push(cell.innerText);
+                row.querySelectorAll('td').forEach(function(cell, index) {
+                    if (index < headers.length - 1) { // Exclude last column (actions)
+                        rowData.push(cell.innerText);
+                    }
                 });
                 rows.push(rowData);
             });
