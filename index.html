@@ -352,17 +352,19 @@
         function generatePDF() {
             var { jsPDF } = window.jspdf;
             var doc = new jsPDF();
+            
+            // Add Employee Permission Report title
+            doc.setFontSize(18);
+            doc.text('Employee Permission Report', 14, 20);
+
+            // Fetch table data
             var table = document.getElementById('employeeTable');
             var rows = [];
-
-            // Add table headers
             var headers = [];
             table.querySelectorAll('th').forEach(function(header) {
                 headers.push(header.innerText);
             });
             rows.push(headers);
-
-            // Add table rows
             table.querySelectorAll('tbody tr').forEach(function(row) {
                 var rowData = [];
                 row.querySelectorAll('td').forEach(function(cell) {
@@ -371,9 +373,35 @@
                 rows.push(rowData);
             });
 
+            // Add permission details table
             doc.autoTable({
+                startY: 30,
                 head: [rows[0]],
                 body: rows.slice(1),
+            });
+
+            // Calculate total days spent for each employee
+            var employees = JSON.parse(localStorage.getItem('employees')) || [];
+            var nameDaysMap = {};
+            employees.forEach(function(employee) {
+                if (nameDaysMap[employee.name]) {
+                    nameDaysMap[employee.name] += parseInt(employee.days);
+                } else {
+                    nameDaysMap[employee.name] = parseInt(employee.days);
+                }
+            });
+
+            // Add Total Days Spent table
+            var totalDaysRows = [['Name', 'Total Days Spent', 'Status']];
+            for (var name in nameDaysMap) {
+                var status = nameDaysMap[name] >= 7 ? "FINISHED" : "";
+                totalDaysRows.push([name, nameDaysMap[name], status]);
+            }
+
+            doc.autoTable({
+                startY: doc.autoTable.previous.finalY + 10,
+                head: [totalDaysRows[0]],
+                body: totalDaysRows.slice(1),
             });
 
             doc.save('Employee_Permission_Report.pdf');
